@@ -1,10 +1,11 @@
+# Import
 from tkinter import Tk, Button, ttk
 from tkinter.filedialog import askopenfile, asksaveasfilename
 import pandas as pd
 
 
 def save_data(df, n_specimens):
-    # save the file as a worksheet
+    # saveas .xlsx
     savefile = asksaveasfilename(filetypes=[("Excel files", ".xlsx")])
     with pd.ExcelWriter(savefile + ".xlsx") as writer:
         df.to_excel(
