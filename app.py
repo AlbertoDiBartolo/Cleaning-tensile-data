@@ -1,10 +1,11 @@
-# import
-from tkinter import *
-from tkinter import ttk
+# import Python libraries
+from tkinter import Tk, Button, ttk
 from tkinter.filedialog import askopenfile, asksaveasfilename
 import pandas as pd
-from clean import *
 
+# import local libraries
+from fn_cleandata import cleaning
+from fn_exportdata import save_data
 
 # instantiate Tk
 root = Tk()
@@ -13,42 +14,16 @@ root.eval("tk::PlaceWindow . center")
 
 
 def clean_file():
-    # cleans, formats and saves the data
+    # button command; opens, cleans, and savesas data to xlsx
 
     # file selection
     loadfile = askopenfile(mode="r", filetypes=[("Excel files", ".csv")])
 
-    # the selected file is converted to a pandas dataframe
-    df = pd.read_csv(
-        loadfile,
-        encoding="ISO-8859-1",
-        names=[
-            "info",
-            "dL (mm)",
-            "F (kN)",
-            "specimen",
-            "strain (%)",
-            "stress (MPa)",
-            "thickness (mm)",
-        ],
-    )
+    # run the cleaning function
+    df, n_specimens = cleaning(loadfile)
 
-    # clean the dataframe
-    # cleaning() retunrs the clean dataframe and the number of specimens
-    df, n_specimens = cleaning(df)
-
-    # save the file as a worksheet
-    savefile = asksaveasfilename(filetypes=[("Excel files", ".xlsx")])
-    with pd.ExcelWriter(savefile + ".xlsx") as writer:
-        df.to_excel(
-            writer, sheet_name="Data", index=False
-        )  # save the whole dataframe to the first sheet
-        for i in range(
-            n_specimens
-        ):  # the data for each specimen are saved to separate sheets
-            df[df["specimen"] == i + 1].to_excel(
-                writer, sheet_name=f"specimen{i+1}", index=False
-            )
+    # run the save function
+    save_data(df=df, n_specimens=n_specimens)
 
 
 Button(root, text="Clean File", command=clean_file).pack()
